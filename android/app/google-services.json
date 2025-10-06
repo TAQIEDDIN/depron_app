@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "641719923537",
+    "project_id": "depron-app",
+    "storage_bucket": "depron-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:641719923537:android:9b3a72685806592aa6d970",
+        "android_client_info": {
+          "package_name": "com.example.depron_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLUKTb1arnol1TdnEDvEkC69RaFPV_o78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:641719923537:android:73c5e1f610f2bce6a6d970",
+        "android_client_info": {
+          "package_name": "com.example.takim"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLUKTb1arnol1TdnEDvEkC69RaFPV_o78"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

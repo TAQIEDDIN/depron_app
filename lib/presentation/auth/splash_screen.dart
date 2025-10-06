@@ -1,3 +1,4 @@
+//splash_screen.dart
 import 'package:flutter/material.dart';
 import 'package:depron_app/presentation/auth/login_screen.dart'; // Doğrudan giriş ekranına geçeceğiz
 

@@ -1,14 +1,14 @@
+//auth_service.dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart'; // 💡 تم إضافة هذا للاستخدام مع ChangeNotifier
-import '../models/user_model.dart'; 
+import 'package:flutter/foundation.dart';
+import '../models/user_model.dart';
 
-// 💡 يجب أن نستخدم with ChangeNotifier حتى يتمكن Provider من الاستماع للتغييرات
-class AuthService with ChangeNotifier { 
+class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // 1. Yeni kullanıcı kaydı (Sign Up)
+  // 1️⃣ تسجيل مستخدم جديد (Sign Up)
   Future<UserModel?> signUp({
     required String email,
     required String password,
@@ -20,13 +20,13 @@ class AuthService with ChangeNotifier {
     String? institutionName,
   }) async {
     try {
-      // Firebase Auth'ta hesap oluşturma
+      // إنشاء المستخدم في Firebase Auth
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // Kullanıcı veri modelini oluşturma
+      // إنشاء نموذج المستخدم
       UserModel newUser = UserModel(
         uid: userCredential.user!.uid,
         email: email,
@@ -38,20 +38,20 @@ class AuthService with ChangeNotifier {
         institutionName: institutionName,
       );
 
-      // Ek kullanıcı verilerini Firestore'da saklama
+      // حفظ بيانات إضافية في Firestore
       await _db.collection('users').doc(newUser.uid).set(newUser.toMap());
 
       return newUser;
     } on FirebaseAuthException catch (e) {
-      debugPrint("Firebase Auth Hatası: ${e.message}"); // 💡 تم تغيير print إلى debugPrint
+      debugPrint("Firebase Auth Error: ${e.message}");
       return null;
     } catch (e) {
-      debugPrint("Genel Kayıt Hatası: $e"); // 💡 تم تغيير print إلى debugPrint
+      debugPrint("Sign Up Error: $e");
       return null;
     }
   }
 
-  // 2. Giriş yapma (Sign In) - هذه هي الدالة التي تستخدمها شاشة الدخول (LoginScreen).
+  // 2️⃣ تسجيل الدخول (Sign In)
   Future<User?> signIn(String email, String password) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -60,15 +60,13 @@ class AuthService with ChangeNotifier {
       );
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
-      debugPrint("Firebase Auth Hatası: ${e.message}"); // 💡 تم تغيير print إلى debugPrint
-      // 💡 مهم: يجب إلقاء الخطأ (rethrow) لكي تتمكن شاشة الدخول من التقاطه وعرضه للمستخدم.
-      rethrow; 
+      debugPrint("Firebase Auth Error: ${e.message}");
+      rethrow; // يسمح للواجهة الأمامية بعرض رسالة الخطأ
     }
   }
 
-  // 3. Firestore'dan kullanıcının tüm verilerini okuma (Rol dahil)
-  // 💡 تم توحيد الاسم إلى fetchUserModel ليتطابق مع ما يتوقعه AuthWrapper.
-  Future<UserModel?> fetchUserModel(String uid) async { 
+  // 3️⃣ جلب بيانات المستخدم من Firestore
+  Future<UserModel?> fetchUserModel(String uid) async {
     try {
       DocumentSnapshot doc = await _db.collection('users').doc(uid).get();
       if (doc.exists) {
@@ -76,15 +74,15 @@ class AuthService with ChangeNotifier {
       }
       return null;
     } catch (e) {
-      debugPrint("Kullanıcı verisi çekme hatası: $e"); // 💡 تم تغيير print إلى debugPrint
+      debugPrint("Fetch UserModel Error: $e");
       return null;
     }
   }
 
-  // 4. Kullanıcı durumunu takip etme (giriş yapmış mı kontrolü) - AuthWrapper يستخدم هذا Stream
+  // 4️⃣ Stream لمتابعة حالة تسجيل الدخول/الخروج
   Stream<User?> get userChanges => _auth.authStateChanges();
 
-  // 5. Çıkış yapma (Sign Out)
+  // 5️⃣ تسجيل الخروج (Sign Out)
   Future<void> signOut() async {
     await _auth.signOut();
   }

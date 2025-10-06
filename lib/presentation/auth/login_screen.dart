@@ -1,4 +1,6 @@
 // login_screen.dart
+import 'package:depron_app/presentation/personnel/personnel_dashboard.dart';
+import 'package:depron_app/presentation/user/limited_map_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:depron_app/data/services/auth_service.dart';
@@ -21,51 +23,58 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _errorMessage;
 
   // 💡 وظيفة تسجيل الدخول
-  Future<void> _signIn() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+ Future<void> _signIn() async {
+  if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+  setState(() {
+    _isLoading = true;
+    _errorMessage = null;
+  });
 
-    try {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      
-      // 1. محاولة تسجيل الدخول في Firebase Auth
-      final user = await authService.signIn(_emailController.text.trim(), _passwordController.text.trim());
-      
-      if (user != null) {
-        // 2. إذا نجح الدخول، حاول جلب بيانات المستخدم من Firestore
-        final userModel = await authService.fetchUserModel(user.uid);
-        
-        if (userModel == null) {
-          // 3. حالة الخطأ: تسجيل الدخول ناجح ولكن لا توجد بيانات في Firestore
-          // هذا هو سبب المشكلة المتكررة!
-          await authService.signOut(); // تسجيل الخروج لتنظيف الحالة
-          setState(() {
-            _errorMessage = 'Giriş Başarılı, Ancak Kullanıcı Verileri Eksik. Lütfen yeni bir hesap oluşturarak kaydı tamamlayın.'; 
-          });
-          return;
-        }
+  try {
+    final authService = Provider.of<AuthService>(context, listen: false);
+
+    final user = await authService.signIn(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    );
+
+    if (user != null) {
+      final userModel = await authService.fetchUserModel(user.uid);
+
+      if (userModel == null) {
+        await authService.signOut();
+        setState(() {
+          _errorMessage =
+              'Giriş Başarılı, Ancak Kullanıcı Verileri Eksik. Lütfen yeni bir hesap oluşturarak kaydı tamamlayın.';
+        });
+        return;
       }
-      
-      // إذا كان كل شيء على ما يرام (user != null و userModel != null)، سيتولى AuthWrapper التوجيه.
-      
-    } catch (e) {
-      // التعامل مع أخطاء المصادقة (كلمة مرور غير صحيحة، مستخدم غير موجود، إلخ)
-      setState(() {
-        // رسالة الخطأ الأكثر شيوعاً
-        _errorMessage = 'Giriş Hatası: E-posta veya şifre yanlış.'; 
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+
+      // ✅ هنا التوجيه المباشر حسب الدور
+      if (userModel.role == 'personnel') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const PersonnelDashboard()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LimitedMapView()),
+        );
+      }
     }
+  } catch (e) {
+    setState(() {
+      _errorMessage = 'Giriş Hatası: E-posta veya şifre yanlış.';
+    });
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 3),
                         )
                       : const Text(
-                          'Giriş Yap',
+                          'Giriş Yap ',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
